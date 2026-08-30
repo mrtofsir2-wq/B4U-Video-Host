@@ -1,0 +1,9 @@
+[
+  {
+    "id": "test-flower",
+    "title": "Test Video",
+    "description": "B4U Video Host playback test",
+    "type": "video/mp4",
+    "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+]
