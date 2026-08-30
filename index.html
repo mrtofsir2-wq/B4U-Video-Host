@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>B4U Video Host</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header><h1>B4U Video Host</h1><span>TEST PLAYER</span></header>
+    <section class="player-card">
+      <video id="video" controls playsinline preload="metadata" poster="">
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+      <h2>Test Video</h2>
+      <p id="status">Ready to play</p>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
