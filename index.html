@@ -12,15 +12,36 @@
       <div><h1>B4U Video Host</h1><p class="sub">Release-powered video library</p></div>
       <span class="badge">TEST</span>
     </header>
+
     <section class="player-card">
-      <div class="player-wrap">
-        <video id="video" controls playsinline preload="metadata"></video>
-        <div id="quality" class="quality" hidden></div>
+      <div class="player-wrap" id="player">
+        <video id="video" playsinline preload="metadata"></video>
+        <div class="center-play" id="center-play" aria-hidden="true">▶</div>
+        <div class="custom-controls" id="controls">
+          <div class="progress-row">
+            <input id="progress" class="progress" type="range" min="0" max="1000" value="0" aria-label="Video progress">
+          </div>
+          <div class="control-row">
+            <button id="play-btn" class="control-btn" type="button" aria-label="Play">▶</button>
+            <button id="back-btn" class="control-btn" type="button" aria-label="Back 10 seconds">↶10</button>
+            <button id="forward-btn" class="control-btn" type="button" aria-label="Forward 10 seconds">10↷</button>
+            <button id="mute-btn" class="control-btn" type="button" aria-label="Mute">🔊</button>
+            <input id="volume" class="volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+            <span id="time" class="time">0:00 / 0:00</span>
+            <div class="control-spacer"></div>
+            <div id="quality" class="quality-control">
+              <button id="quality-btn" class="control-btn quality-trigger" type="button" aria-haspopup="menu" aria-expanded="false">⚙ Quality</button>
+              <div id="quality-menu" class="quality-menu" role="menu" hidden></div>
+            </div>
+            <button id="fullscreen-btn" class="control-btn" type="button" aria-label="Fullscreen">⛶</button>
+          </div>
+        </div>
       </div>
       <div class="now-playing">
         <div><h2 id="video-title">Loading…</h2><p id="status">Loading release library…</p></div>
       </div>
     </section>
+
     <section class="library">
       <div class="library-head"><div><h2>Videos</h2><p class="hint">Automatically discovered from the latest GitHub Release</p></div><span id="count"></span></div>
       <div id="video-list" class="video-list"></div>
