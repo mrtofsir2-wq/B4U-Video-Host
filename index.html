@@ -8,15 +8,23 @@
 </head>
 <body>
   <main class="app">
-    <header><h1>B4U Video Host</h1><span>VIDEO LIST TEST</span></header>
+    <header>
+      <div><h1>B4U Video Host</h1><p class="sub">Release-powered video library</p></div>
+      <span class="badge">TEST</span>
+    </header>
     <section class="player-card">
-      <video id="video" controls playsinline preload="metadata"></video>
-      <h2 id="video-title">Loading…</h2>
-      <p id="status">Loading video list…</p>
+      <div class="player-wrap">
+        <video id="video" controls playsinline preload="metadata"></video>
+        <div id="quality" class="quality" hidden></div>
+      </div>
+      <div class="now-playing">
+        <div><h2 id="video-title">Loading…</h2><p id="status">Loading release library…</p></div>
+      </div>
     </section>
     <section class="library">
-      <div class="library-head"><h2>Videos</h2><span id="count"></span></div>
+      <div class="library-head"><div><h2>Videos</h2><p class="hint">Automatically discovered from the latest GitHub Release</p></div><span id="count"></span></div>
       <div id="video-list" class="video-list"></div>
+      <p id="error" class="error" hidden></p>
     </section>
   </main>
   <script src="app.js"></script>
