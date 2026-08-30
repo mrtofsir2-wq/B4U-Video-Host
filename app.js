@@ -7,6 +7,7 @@ const qualityBox = document.getElementById('quality');
 const errorBox = document.getElementById('error');
 
 const REPO = 'mrtofsir2-wq/B4U-Video-Host';
+const QUALITY_OPTIONS = ['144p', '240p', '360p', '480p', '720p', '1080p'];
 let videos = [];
 let current = null;
 let currentQuality = 'original';
@@ -73,19 +74,67 @@ function makeThumbnail(item) {
 
 function renderQuality(item) {
   qualityBox.innerHTML = '';
-  const qs = Object.keys(item.qualities).sort((a,b) => {
-    if (a === 'original') return 99; if (b === 'original') return -99;
-    return parseInt(a) - parseInt(b);
-  });
-  if (qs.length <= 1) { qualityBox.hidden = true; return; }
   qualityBox.hidden = false;
-  const label = document.createElement('span'); label.textContent = 'Quality'; qualityBox.appendChild(label);
-  qs.forEach(q => {
-    const b = document.createElement('button'); b.textContent = q === 'original' ? 'Original' : q;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'quality-trigger';
+  button.textContent = `⚙ Quality${currentQuality !== 'original' ? `: ${currentQuality}` : ''}`;
+  button.setAttribute('aria-haspopup', 'menu');
+  button.setAttribute('aria-expanded', 'false');
+
+  const menu = document.createElement('div');
+  menu.className = 'quality-menu';
+  menu.hidden = true;
+  menu.setAttribute('role', 'menu');
+
+  QUALITY_OPTIONS.forEach(q => {
+    const b = document.createElement('button');
+    b.type = 'button';
     b.className = q === currentQuality ? 'selected' : '';
-    b.onclick = () => { currentQuality = q; setSource(item, q, true); renderQuality(item); };
-    qualityBox.appendChild(b);
+    b.textContent = q;
+    b.setAttribute('role', 'menuitem');
+    const available = Boolean(item.qualities[q]);
+    b.disabled = !available;
+    b.title = available ? `Switch to ${q}` : `${q} is not available for this video`;
+    b.onclick = () => {
+      if (!available) return;
+      currentQuality = q;
+      menu.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+      setSource(item, q, true);
+      renderQuality(item);
+    };
+    menu.appendChild(b);
   });
+
+  if (item.qualities.original) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = currentQuality === 'original' ? 'selected' : '';
+    b.textContent = 'Original';
+    b.setAttribute('role', 'menuitem');
+    b.onclick = () => {
+      currentQuality = 'original';
+      menu.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+      setSource(item, 'original', true);
+      renderQuality(item);
+    };
+    menu.appendChild(b);
+  }
+
+  button.onclick = (e) => {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+    button.setAttribute('aria-expanded', String(!menu.hidden));
+    if (!menu.hidden) {
+      const firstEnabled = [...menu.querySelectorAll('button')].find(b => !b.disabled);
+      firstEnabled?.focus();
+    }
+  };
+
+  qualityBox.append(button, menu);
 }
 
 function setSource(item, q, autoplay=false) {
@@ -103,7 +152,8 @@ function setSource(item, q, autoplay=false) {
 
 function playVideo(item) {
   current = item;
-  currentQuality = item.qualities.original ? 'original' : Object.keys(item.qualities)[0];
+  const available = QUALITY_OPTIONS.filter(q => item.qualities[q]);
+  currentQuality = available.length ? available[available.length - 1] : 'original';
   title.textContent = item.title; status.textContent = 'Loading…';
   setSource(item, currentQuality, true); renderQuality(item);
   document.querySelectorAll('.video-item').forEach(x => x.classList.toggle('active', x.dataset.id === item.id));
@@ -119,7 +169,8 @@ function render() {
     const meta = document.createElement('div'); meta.className = 'meta';
     const strong = document.createElement('strong'); strong.textContent = item.title;
     const small = document.createElement('small');
-    small.textContent = Object.keys(item.qualities).length > 1 ? `${Object.keys(item.qualities).length} qualities` : 'GitHub Release';
+    const qualityCount = Object.keys(item.qualities).filter(q => q !== 'original').length;
+    small.textContent = qualityCount ? `${qualityCount} qualities` : 'GitHub Release';
     meta.append(strong, small); card.appendChild(meta);
     card.addEventListener('click', () => playVideo(item)); list.appendChild(card);
     if (i === 0) playVideo(item);
@@ -135,6 +186,29 @@ async function loadReleases() {
   if (!videos.length) throw new Error('No MP4 videos found in releases');
   render();
 }
+
+document.addEventListener('click', (e) => {
+  if (!qualityBox.contains(e.target)) {
+    const menu = qualityBox.querySelector('.quality-menu');
+    const trigger = qualityBox.querySelector('.quality-trigger');
+    if (menu && !menu.hidden) {
+      menu.hidden = true;
+      trigger?.setAttribute('aria-expanded', 'false');
+    }
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const menu = qualityBox.querySelector('.quality-menu');
+    const trigger = qualityBox.querySelector('.quality-trigger');
+    if (menu && !menu.hidden) {
+      menu.hidden = true;
+      trigger?.setAttribute('aria-expanded', 'false');
+      trigger?.focus();
+    }
+  }
+});
 
 loadReleases().catch(e => {
   status.textContent = 'Could not load video library'; errorBox.hidden = false; errorBox.textContent = e.message; console.error(e);
